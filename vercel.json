@@ -9,6 +9,10 @@
       "dest": "/favicon.ico"
     },
     {
+      "src": "/robots.txt",
+      "dest": "/robots.txt"
+    },
+    {
       "src": "/_expo/(.*)",
       "dest": "/_expo/$1"
     },
@@ -17,7 +21,7 @@
       "dest": "/assets/$1"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|webp|ico|json))",
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|webp|ico|json|txt))",
       "dest": "/$1"
     },
     {

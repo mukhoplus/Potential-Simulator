@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# 사이트맵 (향후 추가 시)
+# Sitemap: https://potential-simulator.vercel.app/sitemap.xml
+
+# 잠재능력 시뮬레이터 - Made By Mukho
+# 메이플스토리 잠재능력 및 에디셔널 잠재능력 시뮬레이션

@@ -4,7 +4,7 @@
 
 > 2025-07-25 Fri ~<br>
 
-메이플스토리 잠재능력 시뮬레이터 - React Native/Expo 기반 모바일 앱
+**[메이플스토리 잠재능력 시뮬레이터](https://potential-simulator.vercel.app/)** - React Native/Expo 기반 모바일 앱
 
 ## 📱 프로젝트 소개
 

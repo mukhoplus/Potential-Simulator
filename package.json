@@ -7,8 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build": "npm install --legacy-peer-deps && expo export -p web",
-    "build:web": "npm install --legacy-peer-deps && expo export -p web"
+    "build": "npm install --legacy-peer-deps && expo export -p web && copy public\\robots.txt dist\\robots.txt",
+    "build:web": "npm install --legacy-peer-deps && expo export -p web && copy public\\robots.txt dist\\robots.txt"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
