@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: MAPLE_COLORS.background,
   },
   contentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 8,
   },
   panelContainer: {
     paddingHorizontal: 4,

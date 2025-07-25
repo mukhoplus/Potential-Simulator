@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: scaledHeight(12),
+    marginBottom: scaledHeight(8),
   },
   cubeImage: {
     width: isSmallScreen ? 20 : 24,
