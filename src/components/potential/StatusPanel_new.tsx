@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Dimensions,
+} from "react-native";
 import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
 
 interface StatusPanelProps {
@@ -12,6 +19,15 @@ interface StatusPanelProps {
   };
 }
 
+// 화면 크기에 따른 스케일링
+const { width, height } = Dimensions.get("window");
+const isSmallScreen = width < 380;
+const isShortScreen = height < 700;
+const fontScale = isSmallScreen ? 0.9 : 1;
+const heightScale = isShortScreen ? 0.8 : 1;
+const scaledFontSize = (size: number) => Math.round(size * fontScale);
+const scaledHeight = (size: number) => Math.round(size * heightScale);
+
 export const StatusPanel: React.FC<StatusPanelProps> = ({
   totalMeso,
   potenMeso,
@@ -20,7 +36,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 }) => {
   const [showMesoDetail, setShowMesoDetail] = useState(false);
 
-  const getNextGradeColor = (currentGrade: PotentialGrade): string => {
+  const getNextGradeColor = useCallback((currentGrade: PotentialGrade): string => {
     switch (currentGrade) {
       case "rare":
         return GRADE_COLORS.epic;
@@ -33,9 +49,9 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
       default:
         return MAPLE_COLORS.successColor;
     }
-  };
+  }, []);
 
-  const renderCeilingStatus = (
+  const renderCeilingStatus = useCallback((
     type: "poten" | "addi",
     current: number,
     max: number,
@@ -74,7 +90,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
         </Text>
       </View>
     );
-  };
+  }, [getNextGradeColor]);
 
   return (
     <View style={styles.panel}>
@@ -166,15 +182,15 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: MAPLE_COLORS.buttonBorder,
     borderRadius: 12,
-    margin: 8,
-    padding: 16,
+    margin: isSmallScreen ? 6 : 8,
+    padding: isSmallScreen ? 12 : 16,
     shadowColor: MAPLE_COLORS.shadowColor,
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.8,
     elevation: 8,
   },
   panelTitle: {
-    fontSize: 18,
+    fontSize: scaledFontSize(18),
     fontWeight: "bold",
     color: MAPLE_COLORS.secondaryText,
     marginBottom: 12,
@@ -187,8 +203,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
+    paddingHorizontal: isSmallScreen ? 10 : 12,
     backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 8,
     marginBottom: 12,
@@ -197,7 +213,7 @@ const styles = StyleSheet.create({
   },
   mesoLabel: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "500",
   },
   mesoValueContainer: {
@@ -205,23 +221,23 @@ const styles = StyleSheet.create({
   },
   mesoValue: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "bold",
   },
   tapHint: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 10,
+    fontSize: scaledFontSize(10),
     opacity: 0.7,
     marginTop: 2,
   },
   ceilingContainer: {
     backgroundColor: "rgba(0,0,0,0.2)",
     borderRadius: 8,
-    padding: 12,
+    padding: isSmallScreen ? 10 : 12,
   },
   ceilingTitle: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "bold",
     marginBottom: 8,
     textAlign: "center",
@@ -233,16 +249,16 @@ const styles = StyleSheet.create({
   },
   ceilingLabel: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "500",
-    width: 60,
+    width: isSmallScreen ? 50 : 60,
   },
   ceilingBar: {
     flex: 1,
-    height: 16,
+    height: isSmallScreen ? 14 : 16,
     backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 8,
-    marginHorizontal: 8,
+    marginHorizontal: isSmallScreen ? 6 : 8,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: MAPLE_COLORS.borderColor,
@@ -252,9 +268,9 @@ const styles = StyleSheet.create({
     borderRadius: 7,
   },
   ceilingText: {
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "bold",
-    width: 50,
+    width: isSmallScreen ? 40 : 50,
     textAlign: "right",
   },
   modalOverlay: {
@@ -274,7 +290,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 18,
+    fontSize: scaledFontSize(18),
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
@@ -283,17 +299,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: isSmallScreen ? 6 : 8,
     paddingHorizontal: 4,
   },
   detailLabel: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "500",
   },
   detailValue: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "bold",
   },
   detailSeparator: {
@@ -303,8 +319,8 @@ const styles = StyleSheet.create({
   },
   modalCloseButton: {
     backgroundColor: MAPLE_COLORS.dangerColor,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: isSmallScreen ? 8 : 10,
+    paddingHorizontal: isSmallScreen ? 16 : 20,
     borderRadius: 6,
     alignSelf: "center",
     marginTop: 16,
@@ -313,7 +329,7 @@ const styles = StyleSheet.create({
   },
   modalCloseText: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "bold",
   },
 });

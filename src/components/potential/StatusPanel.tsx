@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Image,
+} from "react-native";
 import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
 
 interface StatusPanelProps {
@@ -21,7 +28,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
   const [showMesoDetail, setShowMesoDetail] = useState(false);
 
   // 메소 이미지
-  const mesoImage = require('../../../assets/images/meso.png');
+  const mesoImage = require("../../../assets/images/meso.png");
 
   const getNextGradeColor = (currentGrade: PotentialGrade): string => {
     switch (currentGrade) {
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 6,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   mesoRow: {
     flexDirection: "row",
@@ -308,7 +315,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     marginRight: 6,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   detailRow: {
     flexDirection: "row",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Modal,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
 import { useLog } from "../../store/AppContext";
@@ -21,6 +22,16 @@ interface HeaderProps {
   addiMeso: string;
 }
 
+// 화면 크기에 따른 폰트 스케일링
+const { width, height } = Dimensions.get("window");
+const isSmallScreen = width < 380; // 작은 화면 기준
+const isShortScreen = height < 700; // 짧은 화면 기준
+const fontScale = isSmallScreen ? 0.9 : 1; // 작은 화면에서 10% 축소
+const heightScale = isShortScreen ? 0.8 : 1; // 짧은 화면에서 20% 축소
+
+const scaledFontSize = (size: number) => Math.round(size * fontScale);
+const scaledHeight = (size: number) => Math.round(size * heightScale);
+
 export const Header: React.FC<HeaderProps> = ({
   title,
   totalResetCount,
@@ -32,9 +43,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<"all" | "poten" | "addi">("all");
   const log = useLog();
 
-  const renderLogEntry = (entry: LogEntry) => {
+  const renderLogEntry = useCallback((entry: LogEntry) => {
     const date = new Date(entry.timestamp).toLocaleTimeString();
     const gradeUpText = entry.isGradeUp ? " (등급업!)" : "";
 
@@ -67,21 +79,69 @@ export const Header: React.FC<HeaderProps> = ({
         ))}
       </View>
     );
+  }, []);
+
+  // 탭에 따라 필터링된 로그 가져오기 - useMemo로 최적화
+  const filteredLogs = useMemo(() => {
+    switch (activeTab) {
+      case "poten":
+        return log.filter((entry) => entry.type === "poten");
+      case "addi":
+        return log.filter((entry) => entry.type === "addi");
+      default:
+        return log;
+    }
+  }, [log, activeTab]);
+
+  // 탭 렌더링
+  const renderTabButton = (
+    tabType: "all" | "poten" | "addi",
+    label: string
+  ) => {
+    const isActive = activeTab === tabType;
+    const tabColor =
+      tabType === "poten"
+        ? MAPLE_COLORS.potenButton
+        : tabType === "addi"
+        ? MAPLE_COLORS.addiButton
+        : MAPLE_COLORS.primaryText;
+
+    return (
+      <TouchableOpacity
+        key={tabType}
+        style={[
+          styles.tabButton,
+          isActive && styles.tabButtonActive,
+          isActive && { borderBottomColor: tabColor },
+        ]}
+        onPress={() => setActiveTab(tabType)}
+      >
+        <Text
+          style={[
+            styles.tabButtonText,
+            isActive && styles.tabButtonTextActive,
+            isActive && { color: tabColor },
+          ]}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
     <>
       <View style={styles.header}>
+        <View style={styles.placeholder} />
+
+        <Text style={styles.title}>{title}</Text>
+
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => setShowMenu(!showMenu)}
         >
           <Text style={styles.menuIcon}>☰</Text>
         </TouchableOpacity>
-
-        <Text style={styles.title}>{title}</Text>
-
-        <View style={styles.placeholder} />
       </View>
 
       {/* 햄버거 메뉴 */}
@@ -174,13 +234,24 @@ export const Header: React.FC<HeaderProps> = ({
               </View>
             </View>
 
+            {/* 탭 버튼들 */}
+            <View style={styles.tabContainer}>
+              {renderTabButton("all", "전체")}
+              {renderTabButton("poten", "잠재능력")}
+              {renderTabButton("addi", "에디셔널")}
+            </View>
+
             <ScrollView style={styles.logScroll}>
-              {log.length === 0 ? (
+              {filteredLogs.length === 0 ? (
                 <Text style={styles.noLogText}>
-                  아직 재설정 기록이 없습니다.
+                  {activeTab === "all"
+                    ? "아직 재설정 기록이 없습니다."
+                    : `${
+                        activeTab === "poten" ? "잠재능력" : "에디셔널"
+                      } 재설정 기록이 없습니다.`}
                 </Text>
               ) : (
-                log.map(renderLogEntry)
+                filteredLogs.map(renderLogEntry)
               )}
             </ScrollView>
           </View>
@@ -195,9 +266,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 10,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingTop: scaledHeight(10),
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingBottom: scaledHeight(12),
     backgroundColor: MAPLE_COLORS.headerBg,
     borderBottomWidth: 3,
     borderBottomColor: MAPLE_COLORS.secondaryText,
@@ -210,11 +281,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   menuIcon: {
-    fontSize: 20,
+    fontSize: scaledFontSize(20),
     color: MAPLE_COLORS.primaryText,
   },
   title: {
-    fontSize: 18,
+    fontSize: scaledFontSize(18),
     fontWeight: "bold",
     color: MAPLE_COLORS.primaryText,
     flex: 1,
@@ -226,7 +297,7 @@ const styles = StyleSheet.create({
   menuOverlay: {
     position: "absolute",
     top: 80,
-    left: 16,
+    right: 16,
     zIndex: 1000,
   },
   menu: {
@@ -247,7 +318,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "500",
   },
   modalOverlay: {
@@ -258,7 +329,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    height: "80%",
+    height: isShortScreen ? "85%" : "80%",
+    maxHeight: height * 0.9,
     backgroundColor: MAPLE_COLORS.background,
     borderRadius: 12,
     borderWidth: 2,
@@ -268,12 +340,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    padding: isShortScreen ? 12 : 16,
     borderBottomWidth: 1,
     borderBottomColor: MAPLE_COLORS.borderColor,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: scaledFontSize(18),
     fontWeight: "bold",
     color: MAPLE_COLORS.primaryText,
   },
@@ -281,82 +353,107 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   closeButtonText: {
-    fontSize: 18,
+    fontSize: scaledFontSize(18),
     color: MAPLE_COLORS.primaryText,
   },
   logScroll: {
     flex: 1,
-    padding: 16,
+    padding: isSmallScreen || isShortScreen ? 10 : 16,
   },
   logEntry: {
     backgroundColor: MAPLE_COLORS.panelBg,
-    padding: 12,
-    marginBottom: 8,
+    padding: isSmallScreen || isShortScreen ? 8 : 12,
+    marginBottom: isSmallScreen || isShortScreen ? 4 : 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: MAPLE_COLORS.borderColor,
   },
   logTime: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 12,
+    fontSize: scaledFontSize(12),
     marginBottom: 4,
   },
   logText: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "500",
   },
   logGrade: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 12,
+    fontSize: scaledFontSize(12),
     marginTop: 4,
   },
   logOption: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 12,
+    fontSize: scaledFontSize(12),
     marginLeft: 8,
   },
   noLogText: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     textAlign: "center",
     marginTop: 32,
   },
   statisticsSection: {
     borderBottomWidth: 1,
     borderBottomColor: MAPLE_COLORS.borderColor,
-    paddingBottom: 12,
-    marginBottom: 12,
+    paddingBottom: scaledHeight(12),
+    marginBottom: scaledHeight(12),
   },
   statisticsTitle: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 16,
+    fontSize: scaledFontSize(16),
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: scaledHeight(8),
   },
   statisticsContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: isSmallScreen || isShortScreen ? 10 : 16,
   },
   statisticsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 4,
+    paddingVertical: isShortScreen ? 2 : 4,
   },
   statisticsLabel: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "500",
   },
   statisticsValue: {
     color: MAPLE_COLORS.secondaryText,
-    fontSize: 14,
+    fontSize: scaledFontSize(14),
     fontWeight: "bold",
   },
   statisticsSeparator: {
     height: 1,
     backgroundColor: MAPLE_COLORS.borderColor,
     marginVertical: 8,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: MAPLE_COLORS.borderColor,
+    marginBottom: 0,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: isSmallScreen || isShortScreen ? 8 : 12,
+    paddingHorizontal: isSmallScreen || isShortScreen ? 10 : 16,
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  tabButtonActive: {
+    borderBottomWidth: 2,
+  },
+  tabButtonText: {
+    color: MAPLE_COLORS.secondaryText,
+    fontSize: scaledFontSize(14),
+    fontWeight: "500",
+  },
+  tabButtonTextActive: {
+    fontWeight: "bold",
   },
 });

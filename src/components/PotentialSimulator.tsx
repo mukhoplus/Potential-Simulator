@@ -1,5 +1,5 @@
-import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React, { useMemo } from "react";
+import { ScrollView, StyleSheet, View, Dimensions } from "react-native";
 import {
   usePotential,
   useFormattedMeso,
@@ -28,63 +28,84 @@ export const PotentialSimulator: React.FC = () => {
     resetPotential("addi");
   };
 
-  // 천장 정보에 현재 등급 추가
-  const enhancedCeilingInfo = {
-    poten: {
-      ...ceilingInfo.poten,
-      currentGrade: potential.potenGrade,
-    },
-    addi: {
-      ...ceilingInfo.addi,
-      currentGrade: potential.addiGrade,
-    },
-  };
+  // 천장 정보에 현재 등급 추가 - useMemo로 최적화
+  const enhancedCeilingInfo = useMemo(
+    () => ({
+      poten: {
+        ...ceilingInfo.poten,
+        currentGrade: potential.potenGrade,
+      },
+      addi: {
+        ...ceilingInfo.addi,
+        currentGrade: potential.addiGrade,
+      },
+    }),
+    [
+      ceilingInfo.poten,
+      ceilingInfo.addi,
+      potential.potenGrade,
+      potential.addiGrade,
+    ]
+  );
+
+  // 헤더 높이 계산 (동적 크기 고려) - useMemo로 최적화
+  const headerHeight = useMemo(() => {
+    const { height } = Dimensions.get("window");
+    const isShortScreen = height < 700;
+    return isShortScreen ? 60 : 70;
+  }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      <Header
-        title="제네시스 무기 시뮬레이터"
-        totalResetCount={status.resetCounts.poten + status.resetCounts.addi}
-        totalMeso={formattedMeso.total}
-        potenResetCount={status.resetCounts.poten}
-        potenMeso={formattedMeso.poten}
-        addiResetCount={status.resetCounts.addi}
-        addiMeso={formattedMeso.addi}
-      />
-
-      <View style={styles.panelContainer}>
-        <PotentialPanel
-          title="잠재능력"
-          grade={potential.potenGrade}
-          options={potential.poten}
-          type="poten"
-        />
-
-        <PotentialPanel
-          title="에디셔널 잠재능력"
-          grade={potential.addiGrade}
-          options={potential.addi}
-          type="addi"
-        />
-
-        <StatusPanel
+    <View style={styles.container}>
+      {/* 고정 헤더 */}
+      <View style={styles.headerContainer}>
+        <Header
+          title="제네시스 무기 시뮬레이터"
+          totalResetCount={status.resetCounts.poten + status.resetCounts.addi}
           totalMeso={formattedMeso.total}
+          potenResetCount={status.resetCounts.poten}
           potenMeso={formattedMeso.poten}
+          addiResetCount={status.resetCounts.addi}
           addiMeso={formattedMeso.addi}
-          ceilingInfo={enhancedCeilingInfo}
-        />
-
-        <ResetButtons
-          onPotenReset={handlePotenReset}
-          onAddiReset={handleAddiReset}
-          potenCost={formattedMeso.potenNext}
-          addiCost={formattedMeso.addiNext}
         />
       </View>
-    </ScrollView>
+
+      {/* 스크롤 가능한 콘텐츠 */}
+      <ScrollView
+        style={[styles.scrollContainer, { marginTop: headerHeight }]}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <View style={styles.panelContainer}>
+          <PotentialPanel
+            title="잠재능력"
+            grade={potential.potenGrade}
+            options={potential.poten}
+            type="poten"
+          />
+
+          <PotentialPanel
+            title="에디셔널 잠재능력"
+            grade={potential.addiGrade}
+            options={potential.addi}
+            type="addi"
+          />
+
+          <StatusPanel
+            totalMeso={formattedMeso.total}
+            potenMeso={formattedMeso.poten}
+            addiMeso={formattedMeso.addi}
+            ceilingInfo={enhancedCeilingInfo}
+          />
+
+          <ResetButtons
+            onPotenReset={handlePotenReset}
+            onAddiReset={handleAddiReset}
+            potenCost={formattedMeso.potenNext}
+            addiCost={formattedMeso.addiNext}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -93,6 +114,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: MAPLE_COLORS.background,
     minWidth: 360,
+  },
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: MAPLE_COLORS.background,
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: MAPLE_COLORS.background,
   },
   contentContainer: {
     paddingBottom: 20,

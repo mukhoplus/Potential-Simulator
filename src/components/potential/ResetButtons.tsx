@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import React, { useMemo } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions,
+} from "react-native";
 import { MAPLE_COLORS } from "../../types/common";
 
 interface ResetButtonsProps {
@@ -9,17 +16,26 @@ interface ResetButtonsProps {
   addiCost: string;
 }
 
+// 화면 크기에 따른 스케일링
+const { width, height } = Dimensions.get("window");
+const isSmallScreen = width < 380;
+const isShortScreen = height < 700;
+const fontScale = isSmallScreen ? 0.9 : 1;
+const heightScale = isShortScreen ? 0.8 : 1;
+const scaledFontSize = (size: number) => Math.round(size * fontScale);
+const scaledHeight = (size: number) => Math.round(size * heightScale);
+
 export const ResetButtons: React.FC<ResetButtonsProps> = ({
   onPotenReset,
   onAddiReset,
   potenCost,
   addiCost,
 }) => {
-  // 큐브 이미지
-  const cubeImages = {
+  // 큐브 이미지 - useMemo로 메모이제이션하여 불필요한 재생성 방지
+  const cubeImages = useMemo(() => ({
     poten: require("../../../assets/images/poten_cube.webp"),
     addi: require("../../../assets/images/addi_cube.webp"),
-  };
+  }), []);
 
   return (
     <View style={styles.buttonContainer}>
@@ -62,24 +78,24 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 12,
-    marginBottom: 8,
-    paddingHorizontal: 8,
+    marginTop: 0,
+    marginBottom: 0,
+    paddingHorizontal: isSmallScreen || isShortScreen ? 2 : 8,
   },
   resetButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: isSmallScreen || isShortScreen ? 12 : 20,
+    paddingVertical: isSmallScreen || isShortScreen ? 8 : 12,
     borderRadius: 12,
     borderWidth: 3,
     borderColor: MAPLE_COLORS.buttonBorder,
-    margin: 8,
+    margin: isSmallScreen || isShortScreen ? 4 : 8,
     shadowColor: MAPLE_COLORS.shadowColor,
     shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.8,
     elevation: 6,
     flex: 1,
     alignItems: "center",
-    minHeight: 60,
+    minHeight: isSmallScreen || isShortScreen ? 45 : 60,
     justifyContent: "center",
   },
   potenButton: {
@@ -94,9 +110,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cubeImage: {
-    width: 40,
-    height: 40,
-    marginRight: 8,
+    width: isSmallScreen || isShortScreen ? 28 : 40,
+    height: isSmallScreen || isShortScreen ? 28 : 40,
+    marginRight: isSmallScreen || isShortScreen ? 4 : 8,
     resizeMode: "contain",
   },
   textContainer: {
@@ -104,7 +120,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 15,
+    fontSize: scaledFontSize(15),
     fontWeight: "bold",
     textAlign: "center",
     textShadowColor: MAPLE_COLORS.shadowColor,
@@ -113,7 +129,7 @@ const styles = StyleSheet.create({
   },
   buttonCost: {
     color: MAPLE_COLORS.primaryText,
-    fontSize: 12,
+    fontSize: scaledFontSize(12),
     marginTop: 4,
     opacity: 0.9,
     textAlign: "center",
