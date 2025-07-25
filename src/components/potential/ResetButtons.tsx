@@ -83,7 +83,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginTop: 0,
     marginBottom: 0,
-    paddingHorizontal: isSmallScreen || isShortScreen ? 2 : 8,
+    paddingHorizontal: isSmallScreen || isShortScreen ? 4 : 8,
+    paddingVertical: isSmallScreen || isShortScreen ? 4 : 8,
   },
   resetButton: {
     paddingHorizontal: isSmallScreen || isShortScreen ? 12 : 20,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 3,
     borderColor: MAPLE_COLORS.buttonBorder,
-    margin: isSmallScreen || isShortScreen ? 4 : 8,
+    margin: isSmallScreen || isShortScreen ? 2 : 4,
     shadowColor: MAPLE_COLORS.shadowColor,
     shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.8,

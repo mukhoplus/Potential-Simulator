@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, View, Dimensions } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Dimensions,
+  Platform,
+} from "react-native";
 import {
   usePotential,
   useFormattedMeso,
@@ -55,6 +61,17 @@ export const PotentialSimulator: React.FC = () => {
     return isShortScreen ? 60 : 70;
   }, []);
 
+  // 하단 버튼 높이 계산
+  const bottomButtonHeight = useMemo(() => {
+    const { width } = Dimensions.get("window");
+    const isSmallScreen = width < 380;
+    // 버튼 높이 + 패딩 + 보더 + 안전 영역 고려
+    const baseHeight = isSmallScreen ? 70 : 80;
+    // iOS의 경우 하단 여백 추가 (홈 인디케이터 영역)
+    const safeAreaBottom = Platform.OS === "ios" ? 24 : 12;
+    return baseHeight + safeAreaBottom;
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* 고정 헤더 */}
@@ -72,7 +89,13 @@ export const PotentialSimulator: React.FC = () => {
 
       {/* 스크롤 가능한 콘텐츠 */}
       <ScrollView
-        style={[styles.scrollContainer, { marginTop: headerHeight }]}
+        style={[
+          styles.scrollContainer,
+          {
+            marginTop: headerHeight,
+            marginBottom: bottomButtonHeight,
+          },
+        ]}
         contentContainerStyle={styles.contentContainer}
       >
         <View style={styles.panelContainer}>
@@ -96,15 +119,20 @@ export const PotentialSimulator: React.FC = () => {
             addiMeso={formattedMeso.addi}
             ceilingInfo={enhancedCeilingInfo}
           />
-
-          <ResetButtons
-            onPotenReset={handlePotenReset}
-            onAddiReset={handleAddiReset}
-            potenCost={formattedMeso.potenNext}
-            addiCost={formattedMeso.addiNext}
-          />
         </View>
       </ScrollView>
+
+      {/* 하단 고정 버튼 */}
+      <View
+        style={[styles.bottomButtonContainer, { height: bottomButtonHeight }]}
+      >
+        <ResetButtons
+          onPotenReset={handlePotenReset}
+          onAddiReset={handleAddiReset}
+          potenCost={formattedMeso.potenNext}
+          addiCost={formattedMeso.addiNext}
+        />
+      </View>
     </View>
   );
 };
@@ -132,5 +160,20 @@ const styles = StyleSheet.create({
   },
   panelContainer: {
     paddingHorizontal: 4,
+  },
+  bottomButtonContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: MAPLE_COLORS.background,
+    borderTopWidth: 2,
+    borderTopColor: MAPLE_COLORS.borderColor,
+    // paddingBottom: Platform.OS === "ios" ? 24 : 12,
+    paddingHorizontal: 4,
+    shadowColor: MAPLE_COLORS.shadowColor,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    elevation: 8,
   },
 });
