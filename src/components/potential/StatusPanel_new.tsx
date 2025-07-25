@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
 
 interface StatusPanelProps {
@@ -19,9 +19,6 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
   ceilingInfo,
 }) => {
   const [showMesoDetail, setShowMesoDetail] = useState(false);
-
-  // 메소 이미지
-  const mesoImage = require('../../../assets/images/meso.png');
 
   const getNextGradeColor = (currentGrade: PotentialGrade): string => {
     switch (currentGrade) {
@@ -81,10 +78,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 
   return (
     <View style={styles.panel}>
-      <View style={styles.titleContainer}>
-        <Image source={mesoImage} style={styles.mesoImage} />
-        <Text style={styles.panelTitle}>현황</Text>
-      </View>
+      <Text style={styles.panelTitle}>💰 현황</Text>
 
       <TouchableOpacity
         style={styles.mesoRow}
@@ -123,10 +117,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalTitleContainer}>
-              <Image source={mesoImage} style={styles.modalMesoImage} />
-              <Text style={styles.modalTitle}>사용 메소 세부 정보</Text>
-            </View>
+            <Text style={styles.modalTitle}>💰 사용 메소 세부 정보</Text>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>총 사용 메소:</Text>
@@ -186,22 +177,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: MAPLE_COLORS.secondaryText,
+    marginBottom: 12,
     textAlign: "center",
     textShadowColor: MAPLE_COLORS.shadowColor,
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-  },
-  mesoImage: {
-    width: 20,
-    height: 20,
-    marginRight: 6,
-    resizeMode: 'contain',
   },
   mesoRow: {
     flexDirection: "row",
@@ -296,19 +276,8 @@ const styles = StyleSheet.create({
     color: MAPLE_COLORS.secondaryText,
     fontSize: 18,
     fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalTitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 16,
-  },
-  modalMesoImage: {
-    width: 18,
-    height: 18,
-    marginRight: 6,
-    resizeMode: 'contain',
+    textAlign: "center",
   },
   detailRow: {
     flexDirection: "row",

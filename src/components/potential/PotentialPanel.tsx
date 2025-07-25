@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { PotentialOption } from "../../types/potential";
 import {
   GRADE_COLORS,
@@ -12,15 +12,29 @@ interface PotentialPanelProps {
   title: string;
   grade: PotentialGrade;
   options: PotentialOption[];
+  type?: "poten" | "addi"; // 큐브 타입 구분용
 }
 
 export const PotentialPanel: React.FC<PotentialPanelProps> = ({
   title,
   grade,
   options,
+  type = "poten", // 기본값
 }) => {
+  // 큐브 이미지 선택
+  const cubeImages = {
+    poten: require('../../../assets/images/poten_cube.webp'),
+    addi: require('../../../assets/images/addi_cube.webp'),
+  };
+
   const renderOption = (option: PotentialOption, index: number) => (
-    <View key={option.id} style={styles.optionRow}>
+    <View
+      key={option.id}
+      style={[
+        styles.optionRow,
+        { borderLeftColor: GRADE_COLORS[option.grade as PotentialGrade] },
+      ]}
+    >
       <Text
         style={[
           styles.gradeIcon,
@@ -42,9 +56,12 @@ export const PotentialPanel: React.FC<PotentialPanelProps> = ({
 
   return (
     <View style={styles.panel}>
-      <Text style={[styles.panelTitle, { color: GRADE_COLORS[grade] }]}>
-        {title} ({grade.toUpperCase()})
-      </Text>
+      <View style={styles.titleContainer}>
+        <Image source={cubeImages[type]} style={styles.cubeImage} />
+        <Text style={[styles.panelTitle, { color: GRADE_COLORS[grade] }]}>
+          {title} ({grade.toUpperCase()})
+        </Text>
+      </View>
       {options.map(renderOption)}
     </View>
   );
@@ -53,36 +70,60 @@ export const PotentialPanel: React.FC<PotentialPanelProps> = ({
 const styles = StyleSheet.create({
   panel: {
     backgroundColor: MAPLE_COLORS.panelBg,
-    borderWidth: 2,
-    borderColor: MAPLE_COLORS.borderColor,
-    borderRadius: 8,
+    borderWidth: 3,
+    borderColor: MAPLE_COLORS.buttonBorder,
+    borderRadius: 12,
     margin: 8,
-    padding: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
+    padding: 16,
+    shadowColor: MAPLE_COLORS.shadowColor,
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.8,
-    elevation: 5,
+    elevation: 8,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  cubeImage: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+    resizeMode: 'contain',
   },
   panelTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
+    textAlign: "center",
+    textShadowColor: MAPLE_COLORS.shadowColor,
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   optionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginVertical: 2,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginVertical: 3,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "transparent",
   },
   gradeIcon: {
-    fontSize: 16,
-    marginRight: 8,
+    fontSize: 18,
+    marginRight: 12,
+    textShadowColor: MAPLE_COLORS.shadowColor,
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   optionText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "600",
+    flex: 1,
+    textShadowColor: MAPLE_COLORS.shadowColor,
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
 });

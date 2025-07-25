@@ -13,9 +13,23 @@ import { LogEntry } from "../../types/potential";
 
 interface HeaderProps {
   title: string;
+  totalResetCount: number;
+  totalMeso: string;
+  potenResetCount: number;
+  potenMeso: string;
+  addiResetCount: number;
+  addiMeso: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ title }) => {
+export const Header: React.FC<HeaderProps> = ({
+  title,
+  totalResetCount,
+  totalMeso,
+  potenResetCount,
+  potenMeso,
+  addiResetCount,
+  addiMeso,
+}) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
   const log = useLog();
@@ -112,6 +126,54 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               </TouchableOpacity>
             </View>
 
+            {/* 통계 섹션 */}
+            <View style={styles.statisticsSection}>
+              <Text style={styles.statisticsTitle}>📊 통계</Text>
+
+              <View style={styles.statisticsContainer}>
+                <View style={styles.statisticsRow}>
+                  <Text style={styles.statisticsLabel}>총 재설정:</Text>
+                  <Text style={styles.statisticsValue}>
+                    {totalResetCount}회
+                  </Text>
+                </View>
+                <View style={styles.statisticsRow}>
+                  <Text style={styles.statisticsLabel}>총 사용 메소:</Text>
+                  <Text style={styles.statisticsValue}>{totalMeso}</Text>
+                </View>
+
+                <View style={styles.statisticsSeparator} />
+
+                <View style={styles.statisticsRow}>
+                  <Text
+                    style={[
+                      styles.statisticsLabel,
+                      { color: MAPLE_COLORS.potenButton },
+                    ]}
+                  >
+                    잠재능력:
+                  </Text>
+                  <Text style={styles.statisticsValue}>
+                    {potenResetCount}회 / {potenMeso}
+                  </Text>
+                </View>
+
+                <View style={styles.statisticsRow}>
+                  <Text
+                    style={[
+                      styles.statisticsLabel,
+                      { color: MAPLE_COLORS.addiButton },
+                    ]}
+                  >
+                    에디셔널:
+                  </Text>
+                  <Text style={styles.statisticsValue}>
+                    {addiResetCount}회 / {addiMeso}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
             <ScrollView style={styles.logScroll}>
               {log.length === 0 ? (
                 <Text style={styles.noLogText}>
@@ -133,12 +195,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 40,
+    paddingTop: 10,
     paddingHorizontal: 16,
-    paddingBottom: 20,
-    backgroundColor: MAPLE_COLORS.panelBg,
-    borderBottomWidth: 2,
-    borderBottomColor: MAPLE_COLORS.borderColor,
+    paddingBottom: 12,
+    backgroundColor: MAPLE_COLORS.headerBg,
+    borderBottomWidth: 3,
+    borderBottomColor: MAPLE_COLORS.secondaryText,
+    shadowColor: MAPLE_COLORS.shadowColor,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    elevation: 8,
   },
   menuButton: {
     padding: 8,
@@ -255,5 +321,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     marginTop: 32,
+  },
+  statisticsSection: {
+    borderBottomWidth: 1,
+    borderBottomColor: MAPLE_COLORS.borderColor,
+    paddingBottom: 12,
+    marginBottom: 12,
+  },
+  statisticsTitle: {
+    color: MAPLE_COLORS.secondaryText,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  statisticsContainer: {
+    paddingHorizontal: 16,
+  },
+  statisticsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 4,
+  },
+  statisticsLabel: {
+    color: MAPLE_COLORS.primaryText,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  statisticsValue: {
+    color: MAPLE_COLORS.secondaryText,
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  statisticsSeparator: {
+    height: 1,
+    backgroundColor: MAPLE_COLORS.borderColor,
+    marginVertical: 8,
   },
 });
