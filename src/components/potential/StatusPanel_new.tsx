@@ -36,61 +36,67 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 }) => {
   const [showMesoDetail, setShowMesoDetail] = useState(false);
 
-  const getNextGradeColor = useCallback((currentGrade: PotentialGrade): string => {
-    switch (currentGrade) {
-      case "rare":
-        return GRADE_COLORS.epic;
-      case "epic":
-        return GRADE_COLORS.unique;
-      case "unique":
-        return GRADE_COLORS.legendary;
-      case "legendary":
-        return GRADE_COLORS.legendary; // 이미 최고 등급
-      default:
-        return MAPLE_COLORS.successColor;
-    }
-  }, []);
+  const getNextGradeColor = useCallback(
+    (currentGrade: PotentialGrade): string => {
+      switch (currentGrade) {
+        case "rare":
+          return GRADE_COLORS.epic;
+        case "epic":
+          return GRADE_COLORS.unique;
+        case "unique":
+          return GRADE_COLORS.legendary;
+        case "legendary":
+          return GRADE_COLORS.legendary; // 이미 최고 등급
+        default:
+          return MAPLE_COLORS.successColor;
+      }
+    },
+    []
+  );
 
-  const renderCeilingStatus = useCallback((
-    type: "poten" | "addi",
-    current: number,
-    max: number,
-    currentGrade: PotentialGrade
-  ) => {
-    const percentage = max > 0 ? (current / max) * 100 : 0;
-    const isNearCeiling = percentage > 80;
-    const typeText = type === "poten" ? "잠재" : "에디";
-    const nextGradeColor = getNextGradeColor(currentGrade);
+  const renderCeilingStatus = useCallback(
+    (
+      type: "poten" | "addi",
+      current: number,
+      max: number,
+      currentGrade: PotentialGrade
+    ) => {
+      const percentage = max > 0 ? (current / max) * 100 : 0;
+      const isNearCeiling = percentage > 80;
+      const typeText = type === "poten" ? "잠재" : "에디";
+      const nextGradeColor = getNextGradeColor(currentGrade);
 
-    return (
-      <View style={styles.ceilingRow}>
-        <Text style={styles.ceilingLabel}>{typeText} 천장:</Text>
-        <View style={styles.ceilingBar}>
-          <View
+      return (
+        <View style={styles.ceilingRow}>
+          <Text style={styles.ceilingLabel}>{typeText} 천장:</Text>
+          <View style={styles.ceilingBar}>
+            <View
+              style={[
+                styles.ceilingProgress,
+                {
+                  width: `${percentage}%`,
+                  backgroundColor: nextGradeColor,
+                },
+              ]}
+            />
+          </View>
+          <Text
             style={[
-              styles.ceilingProgress,
+              styles.ceilingText,
               {
-                width: `${percentage}%`,
-                backgroundColor: nextGradeColor,
+                color: isNearCeiling
+                  ? MAPLE_COLORS.warningColor
+                  : MAPLE_COLORS.primaryText,
               },
             ]}
-          />
+          >
+            {current}/{max}
+          </Text>
         </View>
-        <Text
-          style={[
-            styles.ceilingText,
-            {
-              color: isNearCeiling
-                ? MAPLE_COLORS.warningColor
-                : MAPLE_COLORS.primaryText,
-            },
-          ]}
-        >
-          {current}/{max}
-        </Text>
-      </View>
-    );
-  }, [getNextGradeColor]);
+      );
+    },
+    [getNextGradeColor]
+  );
 
   return (
     <View style={styles.panel}>

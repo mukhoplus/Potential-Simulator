@@ -32,10 +32,13 @@ export const ResetButtons: React.FC<ResetButtonsProps> = ({
   addiCost,
 }) => {
   // 큐브 이미지 - useMemo로 메모이제이션하여 불필요한 재생성 방지
-  const cubeImages = useMemo(() => ({
-    poten: require("../../../assets/images/poten_cube.webp"),
-    addi: require("../../../assets/images/addi_cube.webp"),
-  }), []);
+  const cubeImages = useMemo(
+    () => ({
+      poten: require("../../../assets/images/poten_cube.webp"),
+      addi: require("../../../assets/images/addi_cube.webp"),
+    }),
+    []
+  );
 
   return (
     <View style={styles.buttonContainer}>

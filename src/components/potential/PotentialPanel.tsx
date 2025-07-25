@@ -31,37 +31,43 @@ export const PotentialPanel: React.FC<PotentialPanelProps> = ({
   type = "poten", // 기본값
 }) => {
   // 큐브 이미지 선택 - useMemo로 최적화
-  const cubeImages = useMemo(() => ({
-    poten: require("../../../assets/images/poten_cube.webp"),
-    addi: require("../../../assets/images/addi_cube.webp"),
-  }), []);
+  const cubeImages = useMemo(
+    () => ({
+      poten: require("../../../assets/images/poten_cube.webp"),
+      addi: require("../../../assets/images/addi_cube.webp"),
+    }),
+    []
+  );
 
-  const renderOption = useCallback((option: PotentialOption, index: number) => (
-    <View
-      key={option.id}
-      style={[
-        styles.optionRow,
-        { borderLeftColor: GRADE_COLORS[option.grade as PotentialGrade] },
-      ]}
-    >
-      <Text
+  const renderOption = useCallback(
+    (option: PotentialOption, index: number) => (
+      <View
+        key={option.id}
         style={[
-          styles.gradeIcon,
-          { color: GRADE_COLORS[option.grade as PotentialGrade] },
+          styles.optionRow,
+          { borderLeftColor: GRADE_COLORS[option.grade as PotentialGrade] },
         ]}
       >
-        {GRADE_ICONS[option.grade as PotentialGrade]}
-      </Text>
-      <Text
-        style={[
-          styles.optionText,
-          { color: GRADE_COLORS[option.grade as PotentialGrade] },
-        ]}
-      >
-        {option.name}
-      </Text>
-    </View>
-  ), []);
+        <Text
+          style={[
+            styles.gradeIcon,
+            { color: GRADE_COLORS[option.grade as PotentialGrade] },
+          ]}
+        >
+          {GRADE_ICONS[option.grade as PotentialGrade]}
+        </Text>
+        <Text
+          style={[
+            styles.optionText,
+            { color: GRADE_COLORS[option.grade as PotentialGrade] },
+          ]}
+        >
+          {option.name}
+        </Text>
+      </View>
+    ),
+    []
+  );
 
   return (
     <View style={styles.panel}>
