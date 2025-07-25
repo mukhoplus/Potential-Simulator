@@ -9,10 +9,10 @@ export const RESET_COSTS = {
     legendary: 45_000_000,
   },
   addi: {
-    rare: 22_000_000,
-    epic: 61_600_000,
-    unique: 74_800_000,
-    legendary: 88_000_000,
+    rare: 11_000_000, // 수정: 22,000,000 → 11,000,000
+    epic: 30_800_000, // 수정: 61,600,000 → 30,800,000
+    unique: 74_800_000, // 유지
+    legendary: 88_000_000, // 유지
   },
 } as const;
 
