@@ -2602,122 +2602,6 @@ export const WEAPON_ADDITIONAL_OPTIONS: PotentialOptionData[] = [
   },
 
   // 2,3번째 라인 레전드리 옵션들 (레전드리 1라인 + 유니크 1라인 옵션만 포함)
-  // 레전드리 1번째 라인 옵션들 (2,3번째 라인에서 가능)
-  {
-    id: "addi_legendary_hp_11p_23",
-    name: "최대 HP +11%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_mp_11p_23",
-    name: "최대 MP +11%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_att_12p_23",
-    name: "공격력 +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_matt_12p_23",
-    name: "마력 +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_crit_12p_23",
-    name: "크리티컬 확률 +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_str_12p_23",
-    name: "STR +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_dex_12p_23",
-    name: "DEX +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_int_12p_23",
-    name: "INT +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_luk_12p_23",
-    name: "LUK +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 7.6538, line3: 7.6538 },
-  },
-  {
-    id: "addi_legendary_damage_12p_23",
-    name: "데미지 +12%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 2.5513, line3: 2.5513 },
-  },
-  {
-    id: "addi_legendary_allstat_9p_23",
-    name: "올스탯 +9%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_str_per_level_2_23",
-    name: "캐릭터 기준 9레벨 당 STR +2",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_dex_per_level_2_23",
-    name: "캐릭터 기준 9레벨 당 DEX +2",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_int_per_level_2_23",
-    name: "캐릭터 기준 9레벨 당 INT +2",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_luk_per_level_2_23",
-    name: "캐릭터 기준 9레벨 당 LUK +2",
-    grade: "legendary",
-    probability: { line1: 0, line2: 5.1026, line3: 5.1026 },
-  },
-  {
-    id: "addi_legendary_att_32_23",
-    name: "공격력 +32",
-    grade: "legendary",
-    probability: { line1: 0, line2: 2.5513, line3: 2.5513 },
-  },
-  {
-    id: "addi_legendary_matt_32_23",
-    name: "마력 +32",
-    grade: "legendary",
-    probability: { line1: 0, line2: 2.5513, line3: 2.5513 },
-  },
-  {
-    id: "addi_legendary_ignore_5p_23",
-    name: "몬스터 방어율 무시 +5%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 2.5513, line3: 2.5513 },
-  },
-  {
-    id: "addi_legendary_boss_18p_23",
-    name: "보스 몬스터 데미지 +18%",
-    grade: "legendary",
-    probability: { line1: 0, line2: 2.5513, line3: 2.5513 },
-  },
-
   // 유니크 1번째 라인 옵션들 (레전드리 2,3번째 라인에서 가능)
   {
     id: "addi_legendary_hp_8p",
@@ -4764,7 +4648,21 @@ export const getWeightedAdditionalOptions = (
       ...option,
       weight: option.probability[lineKey],
     }))
-    .filter((option) => option.weight > 0); // 가중치가 0인 옵션 제외
+    .filter((option) => {
+      // 가중치가 0인 옵션 제외 (부동소수점 오차 고려)
+      const isValidWeight = option.weight > 0.0001;
+
+      // 레전드리 1라인에서 잘못된 옵션 제외
+      if (
+        grade === "legendary" &&
+        lineNumber === 1 &&
+        option.probability.line1 <= 0
+      ) {
+        return false;
+      }
+
+      return isValidWeight;
+    });
 };
 
 // 라인별 가중치 적용 함수 (옵션 타입 구분 방식)
