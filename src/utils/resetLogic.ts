@@ -1,5 +1,6 @@
 import { PotentialOption, PotentialGrade, PotentialType } from "../types";
 import { ItemType } from "../types/common";
+import { ItemCategory } from "../types/potential";
 import {
   GRADE_UP_PROBABILITIES,
   CEILING_COUNTS,
@@ -71,16 +72,35 @@ export const checkGradeUp = (
 // 중복 제한을 고려한 옵션 생성
 export const generateOptionsWithDuplicateLimit = (
   grade: PotentialGrade,
-  type: PotentialType
+  type: PotentialType,
+  selectedItem?: ItemType
 ): PotentialOption[] => {
   const options: PotentialOption[] = [];
   const usedOptions = new Map<string, number>(); // 옵션명 -> 사용 횟수
+
+  // selectedItem을 카테고리로 변환
+  let category: ItemCategory | undefined;
+  if (selectedItem) {
+    const itemMapping: Record<ItemType, ItemCategory> = {
+      gene_wep: "weapon",
+      glove: "glove",
+      hat: "hat",
+      accessory: "accessory",
+      topwear: "top",
+    };
+    category = itemMapping[selectedItem];
+  }
 
   for (let line = 0; line < 3; line++) {
     const lineNumber = (line + 1) as 1 | 2 | 3;
 
     // 해당 등급의 해당 라인에서 가능한 모든 옵션 가져오기
-    let availableOptions = getWeightedOptionsByGrade(grade, lineNumber, type);
+    let availableOptions = getWeightedOptionsByGrade(
+      grade,
+      lineNumber,
+      type,
+      category
+    );
 
     // 중복 제한 적용 (최대 2줄까지)
     availableOptions = availableOptions.filter((option) => {
@@ -98,7 +118,12 @@ export const generateOptionsWithDuplicateLimit = (
 
     if (availableOptions.length === 0) {
       // 가용 옵션이 없으면 전체 풀에서 선택 (중복 제한 무시)
-      availableOptions = getWeightedOptionsByGrade(grade, lineNumber, type);
+      availableOptions = getWeightedOptionsByGrade(
+        grade,
+        lineNumber,
+        type,
+        category
+      );
 
       // 그래도 없으면 다른 라인에서 선택
       if (availableOptions.length === 0) {
@@ -106,7 +131,8 @@ export const generateOptionsWithDuplicateLimit = (
           availableOptions = getWeightedOptionsByGrade(
             grade,
             fallbackLine as 1 | 2 | 3,
-            type
+            type,
+            category
           );
           if (availableOptions.length > 0) break;
         }
@@ -218,7 +244,7 @@ const getDynamicCost = (
     // 선택된 아이템 정보 찾기
     const itemMapping: Record<ItemType, string> = {
       gene_wep: "weapon",
-      glove: "accessory",
+      glove: "glove",
       hat: "hat",
       accessory: "accessory",
       topwear: "top",
@@ -275,7 +301,11 @@ export const resetPotential = (
   }
 
   // 3. 중복 제한 고려한 옵션 생성
-  const newOptions = generateOptionsWithDuplicateLimit(newGrade, type);
+  const newOptions = generateOptionsWithDuplicateLimit(
+    newGrade,
+    type,
+    selectedItem
+  );
 
   // 5. 비용 계산 (동적 비용 적용)
   const cost = selectedItem

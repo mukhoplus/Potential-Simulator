@@ -30,9 +30,39 @@ type AppAction =
   | { type: "RESET_WITH_ITEM"; payload: ItemType };
 
 // 초기 상태 생성
-const createInitialState = (): AppState => {
-  const potenGrade = DEFAULT_SETTINGS.initialPotenGrade;
-  const addiGrade = DEFAULT_SETTINGS.initialAddiGrade;
+const createInitialState = (selectedItem?: ItemType): AppState => {
+  // 선택된 아이템에 따른 초기 등급 결정
+  let potenGrade: PotentialGrade;
+  let addiGrade: PotentialGrade;
+
+  if (selectedItem) {
+    // ITEM_PRESETS에서 해당 아이템의 초기 등급 찾기
+    const { ITEM_PRESETS } = require("../data/resetCosts");
+    const itemMapping: Record<ItemType, string> = {
+      gene_wep: "weapon",
+      glove: "glove",
+      hat: "hat",
+      accessory: "accessory",
+      topwear: "top",
+    };
+
+    const itemPreset = ITEM_PRESETS.find(
+      (item: any) => itemMapping[selectedItem] === item.category
+    );
+
+    if (itemPreset) {
+      potenGrade = itemPreset.initialPotenGrade;
+      addiGrade = itemPreset.initialAddiGrade;
+    } else {
+      // 기본값
+      potenGrade = DEFAULT_SETTINGS.initialPotenGrade;
+      addiGrade = DEFAULT_SETTINGS.initialAddiGrade;
+    }
+  } else {
+    // 기본값 (제네시스 무기)
+    potenGrade = DEFAULT_SETTINGS.initialPotenGrade;
+    addiGrade = DEFAULT_SETTINGS.initialAddiGrade;
+  }
 
   return {
     potential: {
@@ -85,7 +115,10 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case "SET_SELECTED_ITEM":
       return { ...state, selectedItem: action.payload };
     case "RESET_WITH_ITEM":
-      return { ...createInitialState(), selectedItem: action.payload };
+      return {
+        ...createInitialState(action.payload),
+        selectedItem: action.payload,
+      };
     case "RESET_ALL":
       return createInitialState();
     default:
@@ -103,7 +136,11 @@ const AppContext = createContext<{
 export const AppProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(appReducer, null, createInitialState);
+  const [state, dispatch] = useReducer(
+    appReducer,
+    undefined,
+    createInitialState
+  );
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

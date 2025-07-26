@@ -1,8 +1,9 @@
 import { PotentialOption, PotentialOptionData } from "../types/potential";
 import { PotentialGrade, PotentialType } from "../types/common";
+import { ItemCategory } from "../types/potential";
 import {
-  POTENTIAL_OPTIONS,
-  ADDITIONAL_OPTIONS,
+  getPotentialOptionsByCategory,
+  getAdditionalOptionsByCategory,
   getWeightedOptions,
   getWeightedAdditionalOptions,
   isPotentialCurrentGradeOption,
@@ -40,14 +41,15 @@ export const weightedRandomSelect = <T extends { weight: number }>(
 export const getWeightedOptionsByGrade = (
   grade: PotentialGrade,
   lineNumber: 1 | 2 | 3,
-  type: PotentialType = "poten"
+  type: PotentialType = "poten",
+  category?: ItemCategory
 ): (PotentialOptionData & { weight: number })[] => {
   if (type === "poten") {
     // 잠재능력: 수정된 함수 사용
-    return getWeightedOptions(grade, lineNumber);
+    return getWeightedOptions(grade, lineNumber, category);
   } else {
     // 에디셔널: 수정된 함수 사용
-    return getWeightedAdditionalOptions(grade, lineNumber);
+    return getWeightedAdditionalOptions(grade, lineNumber, category);
   }
 };
 
