@@ -73,16 +73,6 @@ export const generateRandomInitialOptions = (
     // 해당 등급의 해당 라인에서 가능한 옵션들 가져오기
     let availableOptions = getWeightedOptionsByGrade(grade, lineNumber, type);
 
-    // 중복 제거 (같은 옵션이 3번 나오는 것을 방지)
-    if (line > 1) {
-      availableOptions = availableOptions.filter((option) => {
-        const count = Array.from(usedOptions).filter(
-          (used) => used === option.name
-        ).length;
-        return count < 2; // 최대 2번까지만
-      });
-    }
-
     if (availableOptions.length === 0) {
       // 가용 옵션이 없으면 전체에서 선택
       availableOptions = getWeightedOptionsByGrade(grade, lineNumber, type);
