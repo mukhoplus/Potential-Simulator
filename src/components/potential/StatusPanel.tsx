@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   ceilingText: {
     fontSize: 14,
     fontWeight: "bold",
-    width: 50,
+    width: 60,
     textAlign: "right",
   },
   modalOverlay: {
