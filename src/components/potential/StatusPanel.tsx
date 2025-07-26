@@ -1,13 +1,8 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Image,
-} from "react-native";
+import React, { useState, useMemo } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { Image } from "expo-image";
 import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
+import { getImageCacheProps } from "../../utils/imageCache";
 
 interface StatusPanelProps {
   totalMeso: string;
@@ -27,8 +22,12 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 }) => {
   const [showMesoDetail, setShowMesoDetail] = useState(false);
 
-  // 메소 이미지
-  const mesoImage = require("../../../assets/images/meso.png");
+  // 메소 이미지 및 캐시 설정
+  const mesoImage = useMemo(
+    () => require("../../../assets/images/meso.png"),
+    []
+  );
+  const imageCacheProps = useMemo(() => getImageCacheProps(), []);
 
   const getNextGradeColor = (currentGrade: PotentialGrade): string => {
     switch (currentGrade) {
@@ -89,7 +88,11 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
   return (
     <View style={styles.panel}>
       <View style={styles.titleContainer}>
-        <Image source={mesoImage} style={styles.mesoImage} />
+        <Image
+          source={mesoImage}
+          style={styles.mesoImage}
+          {...imageCacheProps}
+        />
         <Text style={styles.panelTitle}>현황</Text>
       </View>
 
@@ -131,7 +134,11 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalTitleContainer}>
-              <Image source={mesoImage} style={styles.modalMesoImage} />
+              <Image
+                source={mesoImage}
+                style={styles.modalMesoImage}
+                {...imageCacheProps}
+              />
               <Text style={styles.modalTitle}>사용 메소 세부 정보</Text>
             </View>
 

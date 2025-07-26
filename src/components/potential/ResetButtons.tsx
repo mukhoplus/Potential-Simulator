@@ -4,10 +4,11 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Dimensions,
 } from "react-native";
+import { Image } from "expo-image";
 import { MAPLE_COLORS } from "../../types/common";
+import { getImageCacheProps } from "../../utils/imageCache";
 
 interface ResetButtonsProps {
   onPotenReset: () => void;
@@ -40,6 +41,9 @@ export const ResetButtons: React.FC<ResetButtonsProps> = ({
     []
   );
 
+  // 이미지 캐시 설정
+  const imageCacheProps = useMemo(() => getImageCacheProps(), []);
+
   return (
     <View style={styles.buttonContainer}>
       <TouchableOpacity
@@ -48,7 +52,11 @@ export const ResetButtons: React.FC<ResetButtonsProps> = ({
         activeOpacity={0.8}
       >
         <View style={styles.buttonContent}>
-          <Image source={cubeImages.poten} style={styles.cubeImage} />
+          <Image
+            source={cubeImages.poten}
+            style={styles.cubeImage}
+            {...imageCacheProps}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.buttonText}>잠재능력 재설정</Text>
             <Text style={styles.buttonCost}>({potenCost})</Text>
@@ -62,7 +70,11 @@ export const ResetButtons: React.FC<ResetButtonsProps> = ({
         activeOpacity={0.8}
       >
         <View style={styles.buttonContent}>
-          <Image source={cubeImages.addi} style={styles.cubeImage} />
+          <Image
+            source={cubeImages.addi}
+            style={styles.cubeImage}
+            {...imageCacheProps}
+          />
           <View style={styles.textContainer}>
             <Text style={[styles.buttonText, { color: "#000" }]}>
               에디셔널 재설정

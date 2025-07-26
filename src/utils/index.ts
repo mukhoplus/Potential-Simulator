@@ -2,4 +2,5 @@
 export * from "./potentialLogic";
 export * from "./resetLogic";
 export * from "./potentialHooks";
-export * from "./potentialLogic";
+export * from "./imageCache";
+export * from "./useImagePreloader";
