@@ -5,7 +5,7 @@ import {
   StatusState,
   LogEntry,
 } from "../types/potential";
-import { PotentialGrade } from "../types/common";
+import { PotentialGrade, ItemType } from "../types/common";
 import { DEFAULT_SETTINGS } from "../data/constants";
 import { generateRandomInitialOptions } from "../utils/potentialLogic";
 
@@ -15,6 +15,7 @@ interface AppState {
   ceiling: CeilingState;
   status: StatusState;
   log: LogEntry[];
+  selectedItem: ItemType;
 }
 
 // 액션 타입들
@@ -24,7 +25,9 @@ type AppAction =
   | { type: "SET_STATUS"; payload: StatusState }
   | { type: "ADD_LOG"; payload: LogEntry }
   | { type: "CLEAR_LOG" }
-  | { type: "RESET_ALL" };
+  | { type: "RESET_ALL" }
+  | { type: "SET_SELECTED_ITEM"; payload: ItemType }
+  | { type: "RESET_WITH_ITEM"; payload: ItemType };
 
 // 초기 상태 생성
 const createInitialState = (): AppState => {
@@ -62,6 +65,7 @@ const createInitialState = (): AppState => {
       },
     },
     log: [],
+    selectedItem: "gene_wep",
   };
 };
 
@@ -78,6 +82,10 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, log: [action.payload, ...state.log] };
     case "CLEAR_LOG":
       return { ...state, log: [] };
+    case "SET_SELECTED_ITEM":
+      return { ...state, selectedItem: action.payload };
+    case "RESET_WITH_ITEM":
+      return { ...createInitialState(), selectedItem: action.payload };
     case "RESET_ALL":
       return createInitialState();
     default:
@@ -132,6 +140,26 @@ export const useStatus = () => {
 export const useLog = () => {
   const { state } = useAppState();
   return state.log;
+};
+
+export const useSelectedItem = () => {
+  const { state } = useAppState();
+  return state.selectedItem;
+};
+
+// 아이템 변경 훅
+export const useItemChange = () => {
+  const { dispatch } = useAppState();
+
+  const changeItem = (newItem: ItemType) => {
+    // 모든 상태를 초기화하고 새로운 아이템을 설정
+    dispatch({
+      type: "RESET_WITH_ITEM",
+      payload: newItem,
+    });
+  };
+
+  return { changeItem };
 };
 
 // 계산된 값들

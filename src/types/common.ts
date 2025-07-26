@@ -1,6 +1,7 @@
 // 공통 타입 정의
 export type PotentialGrade = "rare" | "epic" | "unique" | "legendary";
 export type PotentialType = "poten" | "addi";
+export type ItemType = "gene_wep" | "globe" | "hat" | "accessory" | "topwear";
 
 // 등급별 색상
 export const GRADE_COLORS = {
@@ -57,4 +58,13 @@ export const UI_ICONS = {
   log: "📜",
   menu: "≡",
   close: "✖️",
+} as const;
+
+// 아이템 정보
+export const ITEM_INFO = {
+  gene_wep: { name: "제네시스 무기", icon: "⚔️" },
+  globe: { name: "장갑", icon: "🧤" },
+  hat: { name: "모자", icon: "🎩" },
+  accessory: { name: "장신구", icon: "💍" },
+  topwear: { name: "상의", icon: "👕" },
 } as const;

@@ -7,9 +7,16 @@ import {
   Modal,
   ScrollView,
   Dimensions,
+  Image,
 } from "react-native";
-import { MAPLE_COLORS, GRADE_COLORS, PotentialGrade } from "../../types/common";
-import { useLog } from "../../store/AppContext";
+import {
+  MAPLE_COLORS,
+  GRADE_COLORS,
+  PotentialGrade,
+  ITEM_INFO,
+  ItemType,
+} from "../../types/common";
+import { useLog, useSelectedItem, useItemChange } from "../../store/AppContext";
 import { LogEntry } from "../../types/potential";
 
 interface HeaderProps {
@@ -32,6 +39,15 @@ const heightScale = isShortScreen ? 0.8 : 1; // 짧은 화면에서 20% 축소
 const scaledFontSize = (size: number) => Math.round(size * fontScale);
 const scaledHeight = (size: number) => Math.round(size * heightScale);
 
+// 아이템 이미지 리소스
+const ITEM_IMAGES = {
+  gene_wep: require("../../../assets/images/gene_wep.webp"),
+  globe: require("../../../assets/images/globe.png"),
+  hat: require("../../../assets/images/hat.png"),
+  accessory: require("../../../assets/images/accessory.png"),
+  topwear: require("../../../assets/images/topwear.png"),
+} as const;
+
 export const Header: React.FC<HeaderProps> = ({
   title,
   totalResetCount,
@@ -45,6 +61,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [showLogModal, setShowLogModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "poten" | "addi">("all");
   const log = useLog();
+  const selectedItem = useSelectedItem();
+  const { changeItem } = useItemChange();
 
   const renderLogEntry = useCallback((entry: LogEntry) => {
     const date = new Date(entry.timestamp).toLocaleTimeString();
@@ -148,6 +166,40 @@ export const Header: React.FC<HeaderProps> = ({
       {showMenu && (
         <View style={styles.menuOverlay}>
           <View style={styles.menu}>
+            {/* 아이템 선택 메뉴 */}
+            {(Object.keys(ITEM_INFO) as ItemType[]).map((itemType) => (
+              <TouchableOpacity
+                key={itemType}
+                style={[
+                  styles.menuItem,
+                  selectedItem === itemType && styles.selectedMenuItem,
+                ]}
+                onPress={() => {
+                  changeItem(itemType);
+                  setShowMenu(false);
+                }}
+              >
+                <View style={styles.menuItemContent}>
+                  <Image
+                    source={ITEM_IMAGES[itemType]}
+                    style={styles.itemIcon}
+                  />
+                  <Text
+                    style={[
+                      styles.menuItemText,
+                      selectedItem === itemType && styles.selectedMenuItemText,
+                    ]}
+                  >
+                    {ITEM_INFO[itemType].name}
+                    {selectedItem === itemType && " ✓"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* 구분선 */}
+            <View style={styles.menuSeparator} />
+
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
@@ -316,10 +368,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 4,
   },
+  selectedMenuItem: {
+    backgroundColor: MAPLE_COLORS.borderColor,
+  },
+  menuItemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  itemIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
   menuItemText: {
     color: MAPLE_COLORS.primaryText,
     fontSize: scaledFontSize(14),
     fontWeight: "500",
+  },
+  selectedMenuItemText: {
+    color: MAPLE_COLORS.secondaryText,
+    fontWeight: "bold",
+  },
+  menuSeparator: {
+    height: 1,
+    backgroundColor: MAPLE_COLORS.borderColor,
+    marginVertical: 8,
   },
   modalOverlay: {
     flex: 1,

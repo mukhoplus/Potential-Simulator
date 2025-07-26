@@ -11,9 +11,10 @@ import {
   useFormattedMeso,
   useCeilingInfo,
   useStatus,
+  useSelectedItem,
 } from "../store/AppContext";
 import { usePotentialReset } from "../utils/potentialHooks";
-import { MAPLE_COLORS } from "../types/common";
+import { MAPLE_COLORS, ITEM_INFO } from "../types/common";
 import { Header } from "./potential/Header";
 import { PotentialPanel } from "./potential/PotentialPanel";
 import { StatusPanel } from "./potential/StatusPanel";
@@ -24,6 +25,7 @@ export const PotentialSimulator: React.FC = () => {
   const formattedMeso = useFormattedMeso();
   const ceilingInfo = useCeilingInfo();
   const status = useStatus();
+  const selectedItem = useSelectedItem();
   const { resetPotential } = usePotentialReset();
 
   const handlePotenReset = () => {
@@ -77,7 +79,7 @@ export const PotentialSimulator: React.FC = () => {
       {/* 고정 헤더 */}
       <View style={styles.headerContainer}>
         <Header
-          title="제네시스 무기 시뮬레이터"
+          title={`${ITEM_INFO[selectedItem].name} 시뮬레이터`}
           totalResetCount={status.resetCounts.poten + status.resetCounts.addi}
           totalMeso={formattedMeso.total}
           potenResetCount={status.resetCounts.poten}
