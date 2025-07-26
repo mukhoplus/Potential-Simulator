@@ -1,6 +1,7 @@
 import { PotentialGrade, PotentialType } from "../types/common";
+import { getResetCost } from "./resetCosts";
 
-// 레벨별 재설정 비용 (200레벨 기준 - 구간2)
+// 기본 재설정 비용 (200레벨 무기 기준 - 하위 호환성 유지)
 export const RESET_COSTS = {
   poten: {
     rare: 4_500_000,
@@ -9,12 +10,15 @@ export const RESET_COSTS = {
     legendary: 45_000_000,
   },
   addi: {
-    rare: 11_000_000, // 수정: 22,000,000 → 11,000,000
-    epic: 30_800_000, // 수정: 61,600,000 → 30,800,000
-    unique: 74_800_000, // 유지
-    legendary: 88_000_000, // 유지
+    rare: 22_000_000,
+    epic: 61_600_000,
+    unique: 74_800_000,
+    legendary: 88_000_000,
   },
 } as const;
+
+// 동적 재설정 비용 조회 (새로운 방식)
+export const getItemResetCost = getResetCost;
 
 // 천장 시스템 - 등급 상승 보장 횟수
 export const CEILING_COUNTS = {

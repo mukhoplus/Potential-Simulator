@@ -74,8 +74,40 @@ export interface LogEntry {
 
 // 설정 상태
 export interface SettingsState {
-  level: number; // 아이템 레벨 (현재는 200 고정)
-  category: string; // 아이템 분류 (현재는 무기 고정)
+  level: number; // 아이템 레벨
+  category: ItemCategory; // 아이템 분류
   initialPotenGrade: PotentialGrade; // 시작 잠재능력 등급
   initialAddiGrade: PotentialGrade; // 시작 에디셔널 등급
+}
+
+// 아이템 카테고리
+export type ItemCategory = "weapon" | "hat" | "glove" | "accessory" | "top";
+
+// 아이템 레벨과 카테고리별 재설정 비용 정보
+export interface ResetCostInfo {
+  level: number;
+  category: ItemCategory;
+  costs: {
+    poten: {
+      rare: number;
+      epic: number;
+      unique: number;
+      legendary: number;
+    };
+    addi: {
+      rare: number;
+      epic: number;
+      unique: number;
+      legendary: number;
+    };
+  };
+}
+
+// 아이템 정보
+export interface ItemInfo {
+  level: number;
+  category: ItemCategory;
+  name: string;
+  initialPotenGrade: PotentialGrade;
+  initialAddiGrade: PotentialGrade;
 }

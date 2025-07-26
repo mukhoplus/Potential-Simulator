@@ -1,7 +1,8 @@
 import { PotentialOptionData } from "../types/potential";
+import { ItemCategory } from "../types/potential";
 
 // 잠재능력 옵션 데이터 (무기 120~200레벨 기준)
-export const POTENTIAL_OPTIONS: PotentialOptionData[] = [
+export const WEAPON_POTENTIAL_OPTIONS: PotentialOptionData[] = [
   // === 레어 등급 옵션 ===
   // 1번째 라인 옵션들
   {
@@ -776,19 +777,46 @@ export const POTENTIAL_OPTIONS: PotentialOptionData[] = [
   },
 ];
 
+// 하위 호환성을 위한 기본 옵션 (무기 옵션을 기본으로 사용)
+export const POTENTIAL_OPTIONS = WEAPON_POTENTIAL_OPTIONS;
+
+// 카테고리별 잠재능력 옵션 조회 함수
+export const getPotentialOptionsByCategory = (
+  category: ItemCategory
+): PotentialOptionData[] => {
+  // 현재는 무기 옵션만 구현되어 있음
+  // 향후 다른 카테고리 옵션들을 추가할 예정
+  switch (category) {
+    case "weapon":
+      return WEAPON_POTENTIAL_OPTIONS;
+    case "hat":
+    case "glove":
+    case "accessory":
+    case "top":
+    default:
+      // 임시로 무기 옵션 사용 (추후 각 카테고리별 옵션으로 교체 예정)
+      return WEAPON_POTENTIAL_OPTIONS;
+  }
+};
+
 // 등급별 옵션 필터링 함수 (기존 방식)
-export const getOptionsByGrade = (grade: string) => {
-  return POTENTIAL_OPTIONS.filter((option) => option.grade === grade);
+export const getOptionsByGrade = (grade: string, category?: ItemCategory) => {
+  const options = category
+    ? getPotentialOptionsByCategory(category)
+    : POTENTIAL_OPTIONS;
+  return options.filter((option) => option.grade === grade);
 };
 
 // line1 확률 기준으로 현재 등급/하위 등급 옵션 구분 함수
 export const getPotentialOptionsByGradeAndType = (
   grade: string,
-  includeInheritedOptions: boolean = true
+  includeInheritedOptions: boolean = true,
+  category?: ItemCategory
 ) => {
-  const gradeOptions = POTENTIAL_OPTIONS.filter(
-    (option) => option.grade === grade
-  );
+  const options = category
+    ? getPotentialOptionsByCategory(category)
+    : POTENTIAL_OPTIONS;
+  const gradeOptions = options.filter((option) => option.grade === grade);
 
   if (includeInheritedOptions) {
     // 모든 옵션 반환 (현재 등급 + 하위 등급 상속)
@@ -800,20 +828,33 @@ export const getPotentialOptionsByGradeAndType = (
 };
 
 // 현재 등급 고유 옵션만 가져오는 함수
-export const getCurrentGradePotentialOptions = (grade: string) => {
-  return getPotentialOptionsByGradeAndType(grade, false);
+export const getCurrentGradePotentialOptions = (
+  grade: string,
+  category?: ItemCategory
+) => {
+  return getPotentialOptionsByGradeAndType(grade, false, category);
 };
 
 // 하위 등급에서 상속된 옵션만 가져오는 함수
-export const getInheritedPotentialOptions = (grade: string) => {
-  return POTENTIAL_OPTIONS.filter(
+export const getInheritedPotentialOptions = (
+  grade: string,
+  category?: ItemCategory
+) => {
+  const options = category
+    ? getPotentialOptionsByCategory(category)
+    : POTENTIAL_OPTIONS;
+  return options.filter(
     (option) => option.grade === grade && option.probability.line1 === 0
   );
 };
 
 // 라인별 가중치 적용 함수 (기존 방식)
-export const getWeightedOptions = (grade: string, lineNumber: 1 | 2 | 3) => {
-  const options = getOptionsByGrade(grade);
+export const getWeightedOptions = (
+  grade: string,
+  lineNumber: 1 | 2 | 3,
+  category?: ItemCategory
+) => {
+  const options = getOptionsByGrade(grade, category);
   const lineKey =
     `line${lineNumber}` as keyof PotentialOptionData["probability"];
 
@@ -827,11 +868,13 @@ export const getWeightedOptions = (grade: string, lineNumber: 1 | 2 | 3) => {
 export const getWeightedPotentialOptionsByType = (
   grade: string,
   lineNumber: 1 | 2 | 3,
-  includeInheritedOptions: boolean = true
+  includeInheritedOptions: boolean = true,
+  category?: ItemCategory
 ) => {
   const options = getPotentialOptionsByGradeAndType(
     grade,
-    includeInheritedOptions
+    includeInheritedOptions,
+    category
   );
   const lineKey =
     `line${lineNumber}` as keyof PotentialOptionData["probability"];

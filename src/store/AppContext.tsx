@@ -166,6 +166,7 @@ export const useItemChange = () => {
 export const useFormattedMeso = () => {
   const status = useStatus();
   const potential = usePotential();
+  const selectedItem = useSelectedItem();
 
   const formatMeso = (amount: number): string => {
     if (amount >= 100000000) {
@@ -180,12 +181,41 @@ export const useFormattedMeso = () => {
     return amount.toLocaleString();
   };
 
-  // 다음 재설정 비용 계산 (현재 등급에 따른 실제 비용)
+  // 다음 재설정 비용 계산 (아이템별 동적 비용)
   const getNextCost = (type: "poten" | "addi"): string => {
+    const { getResetCost, ITEM_PRESETS } = require("../data/resetCosts");
     const { RESET_COSTS } = require("../data/constants");
+
     const currentGrade =
       type === "poten" ? potential.potenGrade : potential.addiGrade;
-    const cost = RESET_COSTS[type][currentGrade];
+
+    // 선택된 아이템 정보 찾기
+    const itemPreset = ITEM_PRESETS.find((item: any) => {
+      // selectedItem이 ItemType이므로 매핑 필요
+      const itemMapping: Record<string, string> = {
+        gene_wep: "weapon",
+        glove: "accessory",
+        hat: "hat",
+        accessory: "accessory",
+        topwear: "top",
+      };
+      return itemMapping[selectedItem] === item.category;
+    });
+
+    let cost: number;
+    if (itemPreset) {
+      // 동적 비용 계산
+      cost = getResetCost(
+        itemPreset.level,
+        itemPreset.category,
+        type,
+        currentGrade
+      );
+    } else {
+      // 기본값 (하위 호환성)
+      cost = RESET_COSTS[type][currentGrade];
+    }
+
     return formatMeso(cost);
   };
 

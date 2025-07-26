@@ -1,4 +1,5 @@
 import { PotentialOption, PotentialGrade, PotentialType } from "../types";
+import { ItemType } from "../types/common";
 import {
   GRADE_UP_PROBABILITIES,
   CEILING_COUNTS,
@@ -205,6 +206,41 @@ const getPreviousGrade = (grade: PotentialGrade): PotentialGrade => {
   }
 };
 
+// 동적 비용 계산 함수
+const getDynamicCost = (
+  type: PotentialType,
+  grade: PotentialGrade,
+  selectedItem: ItemType
+): number => {
+  try {
+    const { getResetCost, ITEM_PRESETS } = require("../data/resetCosts");
+
+    // 선택된 아이템 정보 찾기
+    const itemMapping: Record<ItemType, string> = {
+      gene_wep: "weapon",
+      glove: "accessory",
+      hat: "hat",
+      accessory: "accessory",
+      topwear: "top",
+    };
+
+    const itemPreset = ITEM_PRESETS.find(
+      (item: any) => itemMapping[selectedItem] === item.category
+    );
+
+    if (itemPreset) {
+      // 동적 비용 계산
+      return getResetCost(itemPreset.level, itemPreset.category, type, grade);
+    } else {
+      // 기본값으로 fallback
+      return getCost(type, grade);
+    }
+  } catch (error) {
+    // 에러 발생 시 기본값 사용
+    return getCost(type, grade);
+  }
+};
+
 // 메인 재설정 로직
 export const resetPotential = (
   type: PotentialType,
@@ -212,6 +248,7 @@ export const resetPotential = (
     grade: PotentialGrade;
     ceilingCount: number;
     options: PotentialOption[];
+    selectedItem?: ItemType;
   }
 ): {
   newGrade: PotentialGrade;
@@ -220,7 +257,7 @@ export const resetPotential = (
   cost: number;
   newCeilingCount: number;
 } => {
-  const { grade: currentGrade, ceilingCount } = currentState;
+  const { grade: currentGrade, ceilingCount, selectedItem } = currentState;
 
   // 1. 등급 상승 체크
   const gradeUpResult = checkGradeUp(type, currentGrade, ceilingCount);
@@ -240,8 +277,10 @@ export const resetPotential = (
   // 3. 중복 제한 고려한 옵션 생성
   const newOptions = generateOptionsWithDuplicateLimit(newGrade, type);
 
-  // 5. 비용 계산
-  const cost = getCost(type, currentGrade);
+  // 5. 비용 계산 (동적 비용 적용)
+  const cost = selectedItem
+    ? getDynamicCost(type, currentGrade, selectedItem)
+    : getCost(type, currentGrade);
 
   return {
     newGrade,
@@ -278,6 +317,7 @@ export const resetPotentialWithDuplicatePrevention = (
     grade: PotentialGrade;
     ceilingCount: number;
     options: PotentialOption[];
+    selectedItem?: ItemType;
   },
   maxRetries: number = 10
 ): {

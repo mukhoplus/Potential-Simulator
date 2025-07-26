@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  Linking,
 } from "react-native";
 import {
   MAPLE_COLORS,
@@ -42,7 +43,7 @@ const scaledHeight = (size: number) => Math.round(size * heightScale);
 // 아이템 이미지 리소스
 const ITEM_IMAGES = {
   gene_wep: require("../../../assets/images/gene_wep.webp"),
-  globe: require("../../../assets/images/globe.png"),
+  glove: require("../../../assets/images/glove.png"),
   hat: require("../../../assets/images/hat.png"),
   accessory: require("../../../assets/images/accessory.png"),
   topwear: require("../../../assets/images/topwear.png"),
@@ -152,7 +153,14 @@ export const Header: React.FC<HeaderProps> = ({
       <View style={styles.header}>
         <View style={styles.placeholder} />
 
-        <Text style={styles.title}>{title}</Text>
+        <View style={styles.titleContainer}>
+          <Image
+            source={ITEM_IMAGES[selectedItem]}
+            style={styles.titleItemIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>{title}</Text>
+        </View>
 
         <TouchableOpacity
           style={styles.menuButton}
@@ -209,6 +217,21 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Text style={styles.menuItemText}>📜 로그 보기</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={async () => {
+                try {
+                  await Linking.openURL("https://made-by-mukho.github.io");
+                } catch (error) {
+                  console.warn("링크를 열 수 없습니다:", error);
+                }
+                setShowMenu(false);
+              }}
+            >
+              <Text style={styles.menuItemText}>👨‍💻 개발자 정보</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => setShowMenu(false)}
@@ -340,8 +363,18 @@ const styles = StyleSheet.create({
     fontSize: scaledFontSize(18),
     fontWeight: "bold",
     color: MAPLE_COLORS.primaryText,
-    flex: 1,
     textAlign: "center",
+    marginLeft: 8,
+  },
+  titleContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  titleItemIcon: {
+    width: scaledHeight(24),
+    height: scaledHeight(24),
   },
   placeholder: {
     width: 36,

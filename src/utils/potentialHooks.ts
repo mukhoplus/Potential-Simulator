@@ -20,6 +20,7 @@ export const usePotentialReset = () => {
       grade: currentGrade,
       ceilingCount: currentCeilingCount,
       options: type === "poten" ? state.potential.poten : state.potential.addi,
+      selectedItem: state.selectedItem, // 선택된 아이템 정보 추가
     };
 
     // 재설정 실행
