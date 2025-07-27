@@ -59,6 +59,22 @@ const extractValueFromName = (name: string): string => {
   return matches ? matches[1] : "";
 };
 
+// 특정 옵션의 중복 제한을 확인하는 함수
+const getOptionDuplicateLimit = (optionName: string): number => {
+  // 피격 시 데미지 무시/무적 옵션 - 최대 2줄
+  if (optionName.includes("피격 시")) {
+    return 2;
+  }
+
+  // 쓸만한 스킬 계열 / 피격 후 무적시간 증가 - 최대 1줄
+  if (optionName.includes("쓸만한") || optionName.includes("피격 후")) {
+    return 1;
+  }
+
+  // 기본적으로는 제한 없음
+  return 3;
+};
+
 // 간단한 랜덤 옵션 생성 (초기 상태용)
 export const generateRandomInitialOptions = (
   grade: PotentialGrade,
@@ -72,6 +88,17 @@ export const generateRandomInitialOptions = (
 
     // 해당 등급의 해당 라인에서 가능한 옵션들 가져오기
     let availableOptions = getWeightedOptionsByGrade(grade, lineNumber, type);
+
+    // 특정 옵션들에 대한 중복 제한 적용
+    if (line > 1) {
+      availableOptions = availableOptions.filter((option) => {
+        const count = Array.from(usedOptions).filter(
+          (used) => used === option.name
+        ).length;
+        const limit = getOptionDuplicateLimit(option.name);
+        return count < limit;
+      });
+    }
 
     if (availableOptions.length === 0) {
       // 가용 옵션이 없으면 전체에서 선택

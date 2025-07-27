@@ -69,6 +69,22 @@ export const checkGradeUp = (
   };
 };
 
+// 특정 옵션의 중복 제한을 확인하는 함수
+const getOptionDuplicateLimit = (optionName: string): number => {
+  // 피격 시 데미지 무시/무적 옵션 - 최대 2줄
+  if (optionName.includes("피격 시")) {
+    return 2;
+  }
+
+  // 쓸만한 스킬 계열 / 피격 후 무적시간 증가 - 최대 1줄
+  if (optionName.includes("쓸만한") || optionName.includes("피격 후")) {
+    return 1;
+  }
+
+  // 기본적으로는 제한 없음
+  return 3;
+};
+
 // 중복 제한을 고려한 옵션 생성
 export const generateOptionsWithDuplicateLimit = (
   grade: PotentialGrade,
@@ -102,18 +118,11 @@ export const generateOptionsWithDuplicateLimit = (
       category
     );
 
-    // 중복 제한 적용 (최대 2줄까지)
+    // 중복 제한 적용 (특정 옵션별 제한)
     availableOptions = availableOptions.filter((option) => {
       const usageCount = usedOptions.get(option.name) || 0;
-      return usageCount < 2;
-    });
-
-    // 특수 제한 옵션 처리 (쓸만한 스킬 등은 1줄만)
-    availableOptions = availableOptions.filter((option) => {
-      if (option.restriction === "unique") {
-        return !usedOptions.has(option.name);
-      }
-      return true;
+      const limit = getOptionDuplicateLimit(option.name);
+      return usageCount < limit;
     });
 
     if (availableOptions.length === 0) {
